@@ -1,11 +1,58 @@
 ####
+
+### 1. Cluster
+- Bir Elasticsearch kümesidir.
+- Birden fazla node içerir.
+- Her cluster’ın bir ismi vardır (örn: es-logs-cluster).
+- Tek bir entry point gibi çalışır. Kullanıcı için bir Elasticsearch cluster, tek bir sistem gibi görünür.
+
+### 2. Node
+- Elasticsearch'ün çalıştığı her bir sunucuya (veya instance’a) node denir.
+- Her node, veriyi tutabilir, arama yapabilir, shard barındırabilir.
+- Node tipleri olabilir: master node, data node, coordinating node, vs.
+
+3. Index
+- Elasticsearch'teki en temel mantıksal veri yapısıdır.
+- SQL'deki tablo gibidir ama NoSQL mantığıyla işler.
+- Örnek: logs-2025-05-03 adında bir index, bugünün log verilerini barındırabilir.
+- Index, veriyi shard’lara böler.
+
+4. Shard
+- Her index, primary ve replica shard’lara bölünür.
+- Her shard aslında küçük bir Lucene instance’dır.
+- Shard’lar sayesinde Elasticsearch ölçeklenebilir ve yüksek performanslı olur.
+- Örnek: Bir index 5 primary shard ve her biri için 1 replica ile oluşturulursa toplamda 10 shard olur.
+
+5. Document
+- Elasticsearch'e gönderilen her veri bir document’tir.
+- JSON formatındadır.
+- Her document’ın bir _id si vardır.
+Örnek:
+```
+{
+  "timestamp": "2025-05-03T11:45:00Z",
+  "message": "User login failed",
+  "user_id": "abc123"
+
+}
+```
+#### 6. Mapping (Şema)
+- Document’lerdeki alanların veri tiplerinin tanımıdır.
+- SQL’deki şemaya benzer.
+- Otomatik yapılabilir (dynamic mapping) veya manuel olarak tanımlanabilir.
+
+#### 7. Analyzer / Tokenizer
+- Full-text arama için veriyi işlerken kullanılan metin analiz araçlarıdır.
+- Kelimeleri küçük harfe çevirme, köklerine ayırma (stemming), durdurma kelimeleri çıkarma gibi görevleri yapar.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### B.Örnek ile Açıklama
+
 #### 1. Veri Kaynakları (Kafka Topic’leri)
 Sistemimize 3 farklı Kafka topic’inden veri geliyor:
-
 - Hiz-topic:  Hız sensöründen veri — toplam 120 kayıt
-
 - Isik-topic: Işık sensöründen veri — toplam 120 kayıt
-
 - Nem-topic:  Nem sensöründen veri — toplam 120 kayıt
 
 Bu veriler Elasticsearch’e aktarılıyor ve her biri ayrı bir index olarak tutuluyor:
