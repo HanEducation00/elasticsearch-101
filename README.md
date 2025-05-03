@@ -23,7 +23,7 @@ Her index için:
 
 #### 3.Shard Yapısı
 
-- Hız Indexi:
+- Hız Indexi: 120 Veri-mesaj
 ```
 Primary Shard:
 40A, 40B, 40C
@@ -34,7 +34,7 @@ Replica Shard:
 40C1, 40C2
 ```
 
-- Işık Indexi:
+- Işık Indexi: 120 Veri-mesaj
 ```
 Primary Shard:
 40K, 40L, 40M
@@ -45,7 +45,7 @@ Replica Shard:
 40M1, 40M2
 ```
 
-- Nem Indexi:
+- Nem Indexi: 120 Veri-mesaj
 ```
 Primary Shard:
 40X, 40Y, 40Z
@@ -60,10 +60,70 @@ Toplam shard sayısı:
 Her index için 9 shard → 3 index = 27 shard
 
 
+#### 4. Node’lara Dağıtım
+- Aynı shard’tan (örneğin 40A, 40A1, 40A2) aynı node’a koymamak
+- Her node’a eşit yük dağıtmak
+- 
+- 3 Node ile Dağılım 
+- 3 Primary
+- 2 Replica
+- 120/4=30
+```
+| Shard    | Node1 | Node2 | Node3 |
+| -------- | ----- | ----- | ----- |
+| **Hız**  | 40A   | 40B   | 40C   |
+|          | 40B1  | 40C1  | 40A1  |
+|          | 40C2  | 40A2  | 40B2  |
 
+| **Işık** | 40K   | 40L   | 40M   |
+|          | 40L1  | 40M1  | 40K1  |
+|          | 40M2  | 40K2  | 40L2  |
+          
+| **Nem**  | 40X   | 40Y   | 40Z   |
+|          | 40Y1  | 40Z1  | 40X1  |
+|          | 40Z2  | 40X2  | 40Y2  |
 
+```
+- 6 Node ile Dağılım 
+- 4 Primary
+- 2 Replica
+- 120/4=30 
+```
+| **Shard**       | **Node1** | **Node2** | **Node3** | **Node4** | **Node5** | **Node6** |
+| --------------- | --------- | --------- | --------- | --------- | --------- | --------- |
+| **Hız Indexi**  | 30A       | 30B       | 30C       | 30D       | 30A1      | 30A2      |
+|                 | 30B1      | 30B2      | 30C1      | 30C2      | 30D1      | 30D2      |
 
+| **Işık Indexi** | 30K       | 30L       | 30M       | 30N       | 30K1      | 30K2      |
+|                 | 30L1      | 30L2      | 30M1      | 30M2      | 30N1      | 30N2      |
 
+| **Nem Indexi**  | 30X       | 30Y       | 30Z       | 30W       | 30X1      | 30X2      |
+|                 | 30Y1      | 30Y2      | 30Z1      | 30Z2      | 30W1      | 30W2      |
+```
+
+- 6 Node ile Dağılım 
+- 6 Primary
+- 2 Replica
+- 120/6=20
+```
+| **Shard**     | **Node1** | **Node2** | **Node3** | **Node4** | **Node5** | **Node6** |
+| ------------- | --------- | --------- | --------- | --------- | --------- | --------- |
+| **Hız (P)**   | 20A       | 20B       | 20C       | 20D       | 20E       | 20F       |
+|               | 20A1      | 20B1      | 20C1      | 20D1      | 20E1      | 20F1      |
+|               | 20A2      | 20B2      | 20C2      | 20D2      | 20E2      | 20F2      |
+
+| **Işık (P)**  | 20K       | 20L       | 20M       | 20N       | 20O       | 20P       |
+|               | 20K1      | 20L1      | 20M1      | 20N1      | 20O1      | 20P1      |
+|               | 20K2      | 20L2      | 20M2      | 20N2      | 20O2      | 20P2      |
+
+| **Nem (P)**   | 20X       | 20Y       | 20Z       | 20W       | 20V       | 20U       |
+|               | 20X1      | 20Y1      | 20Z1      | 20W1      | 20V1      | 20U1      |
+|               | 20X2      | 20Y2      | 20Z2      | 20W2      | 20V2      | 20U2      |
+```
+
+#### 5. Okuma ve Yazma İşlemleri
+- Yazma: Her veri sadece primary shard'a yazılır, ardından replica shard’lara otomatik kopyalanır.
+- Okuma: Hem primary, hem de replica shard’lar kullanılabilir.
 
 
 
