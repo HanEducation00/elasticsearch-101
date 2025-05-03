@@ -1,12 +1,12 @@
 ####
 
-### 1. Cluster
+1. Cluster
 - Bir Elasticsearch kümesidir.
 - Birden fazla node içerir.
 - Her cluster’ın bir ismi vardır (örn: es-logs-cluster).
 - Tek bir entry point gibi çalışır. Kullanıcı için bir Elasticsearch cluster, tek bir sistem gibi görünür.
 
-### 2. Node
+2. Node
 - Elasticsearch'ün çalıştığı her bir sunucuya (veya instance’a) node denir.
 - Her node, veriyi tutabilir, arama yapabilir, shard barındırabilir.
 - Node tipleri olabilir: master node, data node, coordinating node, vs.
