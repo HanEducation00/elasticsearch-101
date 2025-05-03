@@ -47,6 +47,97 @@
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Node Çeşitleri:
+
+1. Master Node:
+Master node, küme yönetimi ve yapılandırma işlemlerini yöneten ana node'dur.
+Küme yönetimi: Node'ların eklenmesi, çıkarılması, shard'ların taşınması, vs. gibi işlemler master node tarafından yönetilir.
+Veri tutmaz ve sorgu işlemi yapmaz, sadece küme yönetimi ile ilgilenir.
+
+2. Data Node:
+Data node, veriyi barındıran ve arama ve veri işleme (searching, indexing, aggregations) işlemlerini yapan node’dur.
+Veri ve shard’lar burada tutulur.
+En fazla yükü taşıyan node tipidir çünkü indeksleme (yeni veri eklemek) ve arama işlemleri burada yapılır.
+
+3. Coordinating Node:
+Coordinating node, gelen sorguları data node’lara yönlendirir ve sonuçları toplar.
+Direct request handling: Yani kullanıcının veya bir uygulamanın yaptığı sorguları, veri node'larına iletmek ve dönen sonuçları toplayıp sunmak.
+Bu node, veri barındırmaz ama sorgu yönlendirmesini yapar.
+
+4. Ingest Node:
+Ingest node, veriyi işleme görevini üstlenir.
+Veri ön işleme (pipeline) işlemleri gibi işlemler ingest node tarafından yapılabilir.
+Mesela, veriyi formatlamak, zaman damgası eklemek veya başka türde veriye dayalı manipülasyonlar yapmak.
+
+5. Machine Learning Node:
+Machine learning node: Elasticsearch’ün makine öğrenimi özelliklerini çalıştıran node’lar.
+Anomalileri tespit etme, trend analizi gibi işlemleri burada yapılır.
+
+- Node'lar birden fazla görev üstlenebilir. Örneğin, Node 1 hem Master Node, hem Data Node hem de Ingest Node görevini üstleniyor.
+- Master Node Sayısı: 3 ya da 5 master node, yüksek erişilebilirlik sağlar. Genellikle 3 master node yeterlidir.
+- Data Node Sayısı: Veri büyüklüğüne ve sorgu sayısına göre artan sayıda data node gereklidir. Küme büyüdükçe bu sayıyı arttırabilirsiniz.
+- İşlem Yükü ve Dağılım: Eğer yüksek işlem gücü ve veri işleme gerekiyorsa, her bir node'un tek başına birden fazla rol üstlenmesi önerilebilir (örneğin, bir node hem data node hem de ingest node olabilir).
+
+### Örnekler
+- 3 nodeli bir yapıda olası görevlendirme.
+```
+| **Node**   | **Master Node** | **Data Node** | **Ingest Node** | **Machine Learning Node** |
+| ---------- | --------------- | ------------- | --------------- | ------------------------- |
+| **Node 1** | ✅               | ✅             | ✅               | ❌                         |
+| **Node 2** | ❌               | ✅             | ❌               | ✅                         |
+| **Node 3** | ✅               | ✅             | ✅               | ❌                         |
+```
+Node 1: Master Node, Data Node, Ingest Node — Veriyi işler, küme yönetimini yapar, veri ön işleme işlemleri yapar.
+Node 2: Data Node, Machine Learning Node — Veriyi işler ve makine öğrenimi analizlerini yapar.
+Node 3: Master Node, Data Node, Ingest Node — Veriyi işler, küme yönetimini yapar, veri ön işleme işlemleri yapar.
+
+
+
+- 6 nodeli bir yapıda olası görevlendirme.
+```
+| **Node**   | **Master Node**       | **Data Node**  | **Ingest Node**   | **Machine Learning Node**  |
+| ---------- | -------------------   | -------------  | ---------------   | -------------------------  |
+| **Node 1** | ✅ (Aktif)           | ✅             | ✅               | ❌                         |
+| **Node 2** | ✅ (Master Eligible) | ✅             | ❌               | ✅                         |
+| **Node 3** | ✅ (Master Eligible) | ✅             | ✅               | ❌                         |
+| **Node 4** | ✅ (Master Eligible) | ✅             | ✅               | ❌                         |
+| **Node 5** | ✅ (Master Eligible) | ✅             | ❌               | ✅                         |
+| **Node 6** | ✅ (Master Eligible) | ✅             | ✅               | ❌                         |
+```
+
+
+Önerilen İdeal Yapılar:
+- Küçük Ölçekli Yapılar (Küme için 3-5 Node):
+3 node (Yalnızca Data Node ve Master Node rolü):
+2 Data Node
+1 Master Node
+Eğer Ingest veya Machine Learning node'ları kullanılacaksa, bir node aynı zamanda Ingest ya da ML rolünü de üstlenebilir.
+
+- Orta Ölçekli Yapılar (Küme için 6-10 Node):
+3 Master Node (Yüksek erişilebilirlik için)
+3-7 Data Node (Veri işleme ve sorgulama işlemleri için)
+1-2 Ingest Node (Veri işleme)
+1-2 Machine Learning Node (Makine öğrenimi ve veri analizi için)
+
+- Büyük Ölçekli Yapılar (Küme için 10+ Node):
+3 Master Node (Yüksek erişilebilirlik için)
+7+ Data Node (Veri hacmi büyükse daha fazla node)
+1-3 Ingest Node (Yüksek veri girişi gereksinimleri için)
+1-3 Machine Learning Node (Veri analizi ve makine öğrenimi için)
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### B.Örnek ile Açıklama
 
 #### 1. Veri Kaynakları (Kafka Topic’leri)
